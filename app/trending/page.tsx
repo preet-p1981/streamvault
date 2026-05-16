@@ -1,10 +1,13 @@
 import MovieCard from '@/components/MovieCard';
 import { MediaItem } from '@/lib/types';
-import { API_URL } from '@/lib/utils';
+
+export const dynamic = 'force-dynamic';
+export const metadata = { title: 'Trending | StreamVault' };
 
 async function fetchSafe(path: string): Promise<MediaItem[]> {
   try {
-    const res = await fetch(`${API_URL}${path}`, { cache: 'no-store' });
+    const base = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || '';
+    const res = await fetch(`${base}${path}`, { cache: 'no-store' });
     if (!res.ok) return [];
     const data = await res.json();
     return (data.results || []) as MediaItem[];
@@ -28,5 +31,3 @@ export default async function TrendingPage() {
     </div>
   );
 }
-
-export const metadata = { title: 'Trending | StreamVault' };

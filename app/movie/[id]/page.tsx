@@ -4,13 +4,16 @@ import { Play, Star, Clock, Calendar } from 'lucide-react';
 import { Metadata } from 'next';
 import { MovieDetail } from '@/lib/types';
 import { tmdbImage } from '@/lib/constants';
-import { getYear, formatRuntime, API_URL } from '@/lib/utils';
+import { getYear, formatRuntime } from '@/lib/utils';
 import CastRow from '@/components/CastRow';
 import Carousel from '@/components/Carousel';
 
+export const dynamic = 'force-dynamic';
+
 async function getMovie(id: string): Promise<MovieDetail | null> {
   try {
-    const res = await fetch(`${API_URL}/api/movie/${id}`, { cache: 'no-store' });
+    const base = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || '';
+    const res = await fetch(`${base}/api/movie/${id}`, { cache: 'no-store' });
     if (!res.ok) return null;
     return res.json();
   } catch {
@@ -35,6 +38,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 
 export default async function MoviePage({ params }: { params: { id: string } }) {
   const movie = await getMovie(params.id);
+
   if (!movie) {
     return (
       <div className="pt-32 px-8 text-center text-white/60">Movie not found.</div>
@@ -77,6 +81,7 @@ export default async function MoviePage({ params }: { params: { id: string } }) 
             {movie.tagline && (
               <p className="text-white/60 italic mt-1">&ldquo;{movie.tagline}&rdquo;</p>
             )}
+
             <div className="flex flex-wrap items-center gap-3 mt-3 text-sm text-white/80">
               <span className="flex items-center gap-1">
                 <Calendar className="w-4 h-4" /> {getYear(movie.release_date)}
